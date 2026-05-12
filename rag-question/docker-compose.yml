@@ -1,0 +1,85 @@
+version: '3.8'
+
+# ==============================================================================
+# Cambodia Labour Law RAG Service — Docker Compose
+# ==============================================================================
+# Usage:
+#   docker compose up -d               → Start all services
+#   docker compose down                → Stop all services
+#   docker compose logs -f rag         → Follow backend logs
+#   docker compose restart rag         → Hot-restart backend only
+# ==============================================================================
+
+services:
+
+  # ──────────────────────────────────────────────
+  # PostgreSQL + pgvector extension
+  # ──────────────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: rag_question
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "54325:5432"            # host:container — matches application.yml defaults
+    volumes:
+      - rag_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rag_question"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────────
+  # Spring Boot RAG Backend
+  # ──────────────────────────────────────────────
+  rag_question:
+    image: bronx/rag-question:${IMAGE_TAG:-dev}
+    container_name: ${SERVICE_NAME:-rag-question}
+    platform: ${DOCKER_PLATFORMS:-linux/amd64}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy     # wait until PostgreSQL is ready
+    ports:
+      - "8090:8090"
+
+    # ✅ extra_hosts must be a sibling of environment/ports, NOT inside healthcheck
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Allows container → Ollama on host (Linux)
+
+    environment:
+      SERVER_PORT: 8090
+
+      # DB — use service name "postgres", not localhost
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rag_question
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+      # ✅ Uses host.docker.internal which is now resolved via extra_hosts above
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-http://host.docker.internal:11434}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-5baabc0cb89d4a719c11b663b7addc0b.VI3CGEawK0LiIwCRrzWXevE6}
+
+      # Model names — override via .env if needed
+      CHAT_MODEL: ${CHAT_MODEL:-gemma4:31b-cloud}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-nomic-embed-text}
+
+        # JVM
+      JAVA_TOOL_OPTIONS: ${JAVA_OPTS:--XX:+UseContainerSupport -XX:MaxRAMPercentage=70.0 -Djava.security.egd=file:/dev/./urandom}
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8090/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s      # Spring Boot needs time to connect and warm up
+
+# ──────────────────────────────────────────────
+# Named Volumes
+# ──────────────────────────────────────────────
+volumes:
+  rag_pgdata:
+    driver: local
