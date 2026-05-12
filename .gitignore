@@ -1,2 +1,12 @@
-# Ignore the khmer-law-chat sub-repo
-khmer-law-chat/
+# Common ignores
+.idea/
+.DS_Store
+.vscode/
+*.log
+.env
+node_modules/
+dist/
+target/
+*.class
+*.jar
+*.war
