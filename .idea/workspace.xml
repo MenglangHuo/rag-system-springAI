@@ -48,6 +48,11 @@
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/rag-question/scripts" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -69,7 +74,7 @@
       <workItem from="1778235523751" duration="250000" />
       <workItem from="1778549873779" duration="1627000" />
       <workItem from="1778552677807" duration="7000" />
-      <workItem from="1778567137973" duration="334000" />
+      <workItem from="1778567137973" duration="638000" />
     </task>
     <servers />
   </component>
