@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #app { height: 100%; }
+  body { @apply font-sans text-slate-800 dark:text-slate-100 antialiased; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-slate-700 rounded-full; }
+  ::-webkit-scrollbar-track { background: transparent; }
+}
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 disabled:opacity-50 disabled:cursor-not-allowed; }
+  .btn-primary { @apply btn bg-brand-600 text-white hover:bg-brand-700 shadow-glow; }
+  .btn-ghost { @apply btn hover:bg-slate-100 dark:hover:bg-slate-800; }
+  .card { @apply rounded-2xl bg-white dark:bg-slate-900 shadow-soft border border-slate-200/70 dark:border-slate-800; }
+  .prose-chat :where(p) { @apply leading-relaxed; }
+  .prose-chat :where(h1,h2,h3) { @apply font-display font-bold mt-4 mb-2; }
+  .prose-chat :where(ul) { @apply list-disc ml-5 space-y-1; }
+  .prose-chat :where(ol) { @apply list-decimal ml-5 space-y-1; }
+  .prose-chat :where(code) { @apply rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[0.85em]; }
+  .prose-chat :where(pre) { @apply rounded-xl bg-slate-900 text-slate-100 p-4 overflow-x-auto text-sm my-3; }
+  .prose-chat :where(pre code) { @apply bg-transparent p-0; }
+  .prose-chat :where(a) { @apply text-brand-600 underline underline-offset-2 hover:text-brand-700; }
+}
