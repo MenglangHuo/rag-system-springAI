@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2ece0726-3695-41aa-abb0-37749f2f10e0" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/rag-question/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rag-question/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/rag-question/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rag-question/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rag-question/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rag-question/src/main/java/bronx/caspearl/rag/config/ChatClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/rag-question/src/main/java/bronx/caspearl/rag/config/ChatClientConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rag-question/src/main/java/bronx/caspearl/rag/controller/RagController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rag-question/src/main/java/bronx/caspearl/rag/controller/RagController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rag-question/src/main/java/bronx/caspearl/rag/services/RagService.java" beforeDir="false" afterPath="$PROJECT_DIR$/rag-question/src/main/java/bronx/caspearl/rag/services/RagService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rag-question/src/main/resources/application-dev.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rag-question/src/main/resources/prompts/query-rewrite.st" beforeDir="false" afterPath="$PROJECT_DIR$/rag-question/src/main/resources/prompts/query-rewrite.st" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3DR606fgO9jEBfbYPaRyiBoYOul" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/home/menglanghuo/.local/share/JetBrains/IntelliJIdea2025.2/Shell Script/shellcheck&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/media/menglanghuo/Menglang/Bronx/rag-question-app/rag-question&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28238.7" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28238.7" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2ece0726-3695-41aa-abb0-37749f2f10e0" name="Changes" comment="" />
+      <created>1778232308922</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778232308922</updated>
+      <workItem from="1778232310393" duration="244000" />
+      <workItem from="1778233387555" duration="1876000" />
+      <workItem from="1778235378744" duration="124000" />
+      <workItem from="1778235523751" duration="250000" />
+      <workItem from="1778549873779" duration="1627000" />
+      <workItem from="1778552677807" duration="7000" />
+      <workItem from="1778567137973" duration="334000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/khmer-law-chat/src/main.js" />
+        <option value="$PROJECT_DIR$/khmer-law-chat/src/stores/auth.js" />
+        <option value="$PROJECT_DIR$/khmer-law-chat/src/stores/chat.js" />
+        <option value="$PROJECT_DIR$/khmer-law-chat/src/composables/useStreaming.js" />
+        <option value="$PROJECT_DIR$/khmer-law-chat/src/types/chat.js" />
+      </list>
+    </option>
+  </component>
+</project>
