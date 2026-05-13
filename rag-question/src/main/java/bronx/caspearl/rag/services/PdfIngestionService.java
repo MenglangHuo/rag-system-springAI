@@ -94,12 +94,36 @@ public class PdfIngestionService {
                     CHUNK_TOKEN_SIZE, CHUNK_OVERLAP, 5, 10000, true);
             List<Document> splitDocuments = textSplitter.apply(documents);
 
-            // 4. Clean control characters
+            // 4. Clean control characters and enrich metadata for source citation
             List<Document> cleanedDocuments = splitDocuments.stream()
                     .filter(doc -> doc.getText() != null && !doc.getText().trim().isEmpty())
-                    .map(doc -> new Document(
-                            doc.getText().replaceAll("[\\x00-\\x09\\x0B\\x0C\\x0E-\\x1F]", " "),
-                            doc.getMetadata()))
+                    .map(doc -> {
+                        String cleanedText = doc.getText()
+                                .replaceAll("[\\x00-\\x09\\x0B\\x0C\\x0E-\\x1F]", " ");
+
+                        // Enrich metadata for SourceCitationAdvisor and ArticleLookupTool
+                        java.util.Map<String, Object> enrichedMeta = new java.util.HashMap<>(doc.getMetadata());
+                        enrichedMeta.put("source_name", LAW_SOURCE_NAME);
+
+                        // Preserve page number from the PDF reader if available
+                        if (doc.getMetadata().containsKey("page_number")) {
+                            enrichedMeta.put("page_number", doc.getMetadata().get("page_number"));
+                        }
+
+                        // Detect article numbers in the chunk text (e.g., "Article 67", "Article 89")
+                        java.util.regex.Matcher matcher = java.util.regex.Pattern
+                                .compile("Article\\s+(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE)
+                                .matcher(cleanedText);
+                        java.util.List<String> articles = new java.util.ArrayList<>();
+                        while (matcher.find()) {
+                            articles.add(matcher.group(1));
+                        }
+                        if (!articles.isEmpty()) {
+                            enrichedMeta.put("article_number", String.join(",", articles));
+                        }
+
+                        return new Document(cleanedText, enrichedMeta);
+                    })
                     .toList();
 
             ingestion.setTotalChunks(cleanedDocuments.size());

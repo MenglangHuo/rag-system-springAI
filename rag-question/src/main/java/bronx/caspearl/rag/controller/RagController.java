@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 @Slf4j
@@ -61,8 +60,8 @@ public class RagController {
     @Operation(summary = "Compare two legal concepts",
             description = "Compare two labour law concepts using a structured comparison template (e.g., FDC vs UDC).")
     public ResponseEntity<AskResponse> compareConcepts(@Valid @RequestBody CompareRequest request) {
-        log.info("POST /compare - {} vs {}", request.concept1(), request.concept2());
-        return ResponseEntity.ok(ragService.compareConcepts(request.concept1(), request.concept2()));
+        log.info("POST /compare - {} vs {}, session: {}", request.concept1(), request.concept2(), request.sessionId());
+        return ResponseEntity.ok(ragService.compareConcepts(request.concept1(), request.concept2(), request.sessionId()));
     }
 
     @GetMapping("/summary")
@@ -70,9 +69,11 @@ public class RagController {
             description = "Get a structured summary of a labour law topic (e.g., overtime pay, maternity leave).")
     public ResponseEntity<AskResponse> summarizeTopic(
             @Parameter(description = "Topic to summarize", example = "overtime pay")
-            @RequestParam @NotBlank String topic) {
-        log.info("GET /summary - topic: {}", topic);
-        return ResponseEntity.ok(ragService.summarizeTopic(topic));
+            @RequestParam @NotBlank String topic,
+            @Parameter(description = "Session ID for conversation continuity (optional)")
+            @RequestParam(required = false) String sessionId) {
+        log.info("GET /summary - topic: {}, session: {}", topic, sessionId);
+        return ResponseEntity.ok(ragService.summarizeTopic(topic, sessionId));
     }
 
     @GetMapping("/article/{articleNumber}")
@@ -80,9 +81,11 @@ public class RagController {
             description = "Look up a specific article from the Cambodia Labour Law by number (e.g., 67, 73).")
     public ResponseEntity<AskResponse> lookupArticle(
             @Parameter(description = "Article number to look up", example = "67")
-            @PathVariable @NotBlank String articleNumber) {
-        log.info("GET /article/{}", articleNumber);
-        return ResponseEntity.ok(ragService.lookupArticle(articleNumber));
+            @PathVariable @NotBlank String articleNumber,
+            @Parameter(description = "Session ID for conversation continuity (optional)")
+            @RequestParam(required = false) String sessionId) {
+        log.info("GET /article/{}, session: {}", articleNumber, sessionId);
+        return ResponseEntity.ok(ragService.lookupArticle(articleNumber, sessionId));
     }
 
     @GetMapping("/analyze")

@@ -13,11 +13,16 @@ Rules:
 - DO NOT answer the question — ONLY return the rewritten question
 - Keep the rewritten question concise (under 200 words)
 - Make it specific to Cambodian Labour Law context
-- If the user's input is a follow-up question (e.g. "summarize that", "explain more", "what about overtime?"),
-  use the Conversation History below to understand what "that" or "it" refers to,
-  and rewrite it into a standalone, self-contained question.
-- If the user asks to summarize, recap, or list previous answers, rewrite it as:
-  "Summarize the following topics discussed: [list the topics from history]"
+- CRITICAL: If the user's input is vague, short, or references prior conversation
+  (e.g. "summarize that", "summary it", "summary pls", "make it short", "explain more",
+  "what about overtime?", "tell me again", "and penalties?"), you MUST:
+  1. Examine the Conversation History to identify what the user is referring to
+  2. Expand it into a complete, standalone, self-contained question
+  3. NEVER return the vague input as-is — that will cause a failed vector search
+- If the user asks to summarize, shorten, or transform a previous answer, rewrite it as:
+  "Provide a [concise summary / brief overview / detailed explanation] of [specific topic from history] under Cambodian Labour Law"
+- If the user says "make it short" or similar, rewrite as:
+  "Give a brief, concise summary of [the topic being discussed in history] under Cambodian Labour Law"
 
 Conversation History (most recent exchanges, may be empty for first question):
 {history}

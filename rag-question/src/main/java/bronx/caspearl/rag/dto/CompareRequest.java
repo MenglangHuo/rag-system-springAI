@@ -9,5 +9,6 @@ public record CompareRequest(
         @NotBlank(message = "First concept must not be blank")
         String concept1,
         @NotBlank(message = "Second concept must not be blank")
-        String concept2
+        String concept2,
+        String sessionId
 ) {}

@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,8 +26,12 @@ import java.util.Optional;
  * This ensures the LLM retains conversation context even if the server restarts.
  *
  * Important: The conversationId passed by Spring AI's MessageChatMemoryAdvisor
- * is our "sessionId" string (e.g. "x7k9p2m4"), NOT the UUID primary key.
+ * is our "sessionId" string (e.g., "x7k9p2m4"), NOT the UUID primary key.
  * We must resolve sessionId → ChatConversation.id (UUID) before querying messages.
+ *
+ * Supports configurable window size and conversation summary:
+ * when total messages exceed the window, older messages are condensed into
+ * a summary system message to prevent context loss.
  */
 @Slf4j
 @Service
@@ -33,6 +39,20 @@ public class JpaChatMemory implements ChatMemory {
 
     private final ChatMessageRepository chatMessageRepository;
     private final ChatConversationRepository chatConversationRepository;
+
+    /**
+     * Number of Q&A rows to fetch from DB. Each row = 2 LLM messages (User + Assistant).
+     * Configurable via application properties: rag.memory.window-size
+     */
+    @Value("${rag.memory.window-size:10}")
+    private int windowSize;
+
+    /**
+     * When total messages exceed this multiple of windowSize, older messages
+     * are summarized into a single system message. Default: 2x window.
+     */
+    @Value("${rag.memory.summary-threshold-multiplier:2}")
+    private int summaryThresholdMultiplier;
 
     public JpaChatMemory(ChatMessageRepository chatMessageRepository,
                          ChatConversationRepository chatConversationRepository) {
@@ -67,19 +87,29 @@ public class JpaChatMemory implements ChatMemory {
 
             ChatConversation conversation = conversationOpt.get();
 
-            // Each Q&A exchange in our DB is 1 row, but equals 2 Messages for the LLM (User + Assistant).
-            // Fetching the last 10 rows equals 20 messages.
-            int rowsToFetch = 10;
-
-            Page<ChatMessage> page = chatMessageRepository.findByConversationIdOrderByCreatedAtDesc(
-                    conversation.getId(), PageRequest.of(0, rowsToFetch));
+            // Fetch recent messages within the window
+            Page<ChatMessage> recentPage = chatMessageRepository.findByConversationIdOrderByCreatedAtDesc(
+                    conversation.getId(), PageRequest.of(0, windowSize));
 
             // DB returns newest first. We need oldest first for the LLM context window.
-            List<ChatMessage> chatMessages = new ArrayList<>(page.getContent());
-            Collections.reverse(chatMessages);
+            List<ChatMessage> recentMessages = new ArrayList<>(recentPage.getContent());
+            Collections.reverse(recentMessages);
 
             List<Message> springAiMessages = new ArrayList<>();
-            for (ChatMessage cm : chatMessages) {
+
+            // Check if there are older messages beyond the window that should be summarized
+            long totalMessages = recentPage.getTotalElements();
+            if (totalMessages > (long) windowSize * summaryThresholdMultiplier) {
+                // Summarize older messages into a system message
+                String summary = buildOlderMessagesSummary(conversation, recentMessages);
+                if (summary != null && !summary.isBlank()) {
+                    springAiMessages.add(new SystemMessage(
+                            "Summary of earlier conversation: " + summary));
+                }
+            }
+
+            // Add recent messages
+            for (ChatMessage cm : recentMessages) {
                 // Only include fully completed exchanges where we have both Q and A
                 if (cm.getStatus() == ChatMessage.MessageStatus.COMPLETED && cm.getAnswer() != null) {
                     springAiMessages.add(new UserMessage(cm.getOriginalQuestion()));
@@ -87,7 +117,7 @@ public class JpaChatMemory implements ChatMemory {
                 }
             }
 
-            log.info("JpaChatMemory restored {} messages for session '{}'",
+            log.info("JpaChatMemory restored {} messages (including summary) for session '{}'",
                     springAiMessages.size(), conversationId);
             return springAiMessages;
 
@@ -101,5 +131,42 @@ public class JpaChatMemory implements ChatMemory {
     public void clear(String conversationId) {
         log.debug("JpaChatMemory.clear() called for {}", conversationId);
         // We leave this as a no-op so we don't accidentally delete permanent chat history.
+    }
+
+    /**
+     * Builds a condensed summary of older messages that are outside the recent window.
+     * This prevents complete context loss for long conversations.
+     */
+    private String buildOlderMessagesSummary(ChatConversation conversation,
+                                              List<ChatMessage> recentMessages) {
+        try {
+            // Fetch the older messages (page 1 = the ones before the recent window)
+            Page<ChatMessage> olderPage = chatMessageRepository.findByConversationIdOrderByCreatedAtDesc(
+                    conversation.getId(), PageRequest.of(1, windowSize));
+
+            if (olderPage.isEmpty()) return null;
+
+            List<ChatMessage> olderMessages = new ArrayList<>(olderPage.getContent());
+            Collections.reverse(olderMessages);
+
+            StringBuilder summary = new StringBuilder();
+            summary.append("The user previously discussed these topics: ");
+
+            for (ChatMessage cm : olderMessages) {
+                if (cm.getStatus() == ChatMessage.MessageStatus.COMPLETED && cm.getOriginalQuestion() != null) {
+                    // Include only the question topics (not full answers) to keep summary compact
+                    String question = cm.getOriginalQuestion();
+                    if (question.length() > 100) {
+                        question = question.substring(0, 100) + "...";
+                    }
+                    summary.append("\"").append(question).append("\"; ");
+                }
+            }
+
+            return summary.toString().trim();
+        } catch (Exception e) {
+            log.warn("Failed to build older messages summary: {}", e.getMessage());
+            return null;
+        }
     }
 }
