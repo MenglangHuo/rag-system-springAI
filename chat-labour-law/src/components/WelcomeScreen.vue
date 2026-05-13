@@ -47,28 +47,6 @@ const faqGroups = [
       'How many days of maternity leave are allowed?',
       'What leave is available for family emergencies?'
     ]
-  },
-  {
-    icon: '🎖️',
-    title: 'Seniority Indemnity',
-    questions: [
-      'What is seniority indemnity?',
-      'Who is eligible for seniority indemnity?',
-      'How is seniority indemnity calculated?',
-      'When must seniority indemnity be paid?',
-      'Is severance pay different from seniority indemnity?'
-    ]
-  },
-  {
-    icon: '🏥',
-    title: 'NSSF & Social Security',
-    questions: [
-      'What is the National Social Security Fund (NSSF)?',
-      'Who must register employees with NSSF?',
-      'What benefits does NSSF provide?',
-      'How are NSSF contributions calculated?',
-      'Who pays NSSF contributions?'
-    ]
   }
 ]
 
